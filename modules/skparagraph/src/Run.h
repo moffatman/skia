@@ -82,7 +82,14 @@ public:
         fOffset.fX += shiftX;
         fOffset.fY += shiftY;
     }
+    void setOffset(SkScalar x, SkScalar y) {
+        fOffset.fX = x;
+        fOffset.fY = y;
+    }
     SkVector advance() const {
+        if (isFloatingPlaceholder()) {
+            return SkVector::Make(0, fAdvance.fY);
+        }
         return SkVector::Make(fAdvance.fX, fFontMetrics.fDescent - fFontMetrics.fAscent + fFontMetrics.fLeading);
     }
     SkVector offset() const { return fOffset; }
@@ -101,6 +108,10 @@ public:
     SkScalar baselineShift() const { return fBaselineShift; }
     PlaceholderStyle* placeholderStyle() const;
     bool isPlaceholder() const { return fPlaceholderIndex != std::numeric_limits<size_t>::max(); }
+    bool isFloatingPlaceholder() const {
+        return isPlaceholder() && placeholderStyle()->fFloating != PlaceholderFloating::kNone;
+    }
+    PlaceholderFloating placeholderFloating() const;
     size_t clusterIndex(size_t pos) const { return fClusterIndexes[pos]; }
     size_t globalClusterIndex(size_t pos) const { return fClusterStart + fClusterIndexes[pos]; }
     SkScalar positionX(size_t pos) const;

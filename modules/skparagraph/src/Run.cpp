@@ -253,6 +253,7 @@ void Run::updateMetrics(InternalLineMetrics* endlineMetrics) {
             break;
 
         case PlaceholderAlignment::kTop:
+        case PlaceholderAlignment::kStretchUp: // TODO(Callum)
             fFontMetrics.fDescent = height + fFontMetrics.fAscent;
             break;
 
@@ -314,6 +315,20 @@ PlaceholderStyle* Run::placeholderStyle() const {
         return &fOwner->placeholders()[fPlaceholderIndex].fStyle;
     } else {
         return nullptr;
+    }
+}
+
+PlaceholderFloating Run::placeholderFloating() const {
+    if (isFloatingPlaceholder()) {
+        PlaceholderFloating floating = placeholderStyle()->fFloating;
+        if (floating == PlaceholderFloating::kStart) {
+            return leftToRight() ? PlaceholderFloating::kLeft : PlaceholderFloating::kRight;
+        } else if (floating == PlaceholderFloating::kEnd) {
+            return leftToRight() ? PlaceholderFloating::kRight: PlaceholderFloating::kLeft;
+        }
+        return floating;
+    } else {
+        return PlaceholderFloating::kNone;
     }
 }
 
