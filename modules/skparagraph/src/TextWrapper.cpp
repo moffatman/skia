@@ -47,23 +47,41 @@ struct LineBreakerWithLittleRounding {
 };
 }  // namespace
 
+void TextWrapper::handleFloatingPlaceholder(SkScalar maxWidth, Cluster* cluster) {
+    if (cluster->run().placeholderFloating() == PlaceholderFloating::kLeft) {
+        fCurrentLeftFloat = cluster->width();
+        if (fSoftLineLeftFloatWidth == 0) {
+            fSoftLineLeftFloatWidth = cluster->width();
+        }
+    }
+    else {
+        fCurrentRightFloat = cluster->width();
+        if (fSoftLineRightFloatWidth == 0) {
+            fSoftLineRightFloatWidth = cluster->width();
+        }
+    }
+    fHeightWithFloatingPlaceholders = std::max(fHeightWithFloatingPlaceholders, fHeight + cluster->run().placeholderStyle()->fHeight);
+}
+
 // Since we allow cluster clipping when they don't fit
 // we have to work with stretches - parts of clusters
-void TextWrapper::lookAhead(SkScalar maxWidth, Cluster* endOfClusters, bool applyRoundingHack) {
-
+void TextWrapper::lookAhead(SkScalar maxWidth, Cluster* endOfClusters, ParagraphImpl* parent) {
     reset();
     fEndLine.metrics().clean();
     fWords.startFrom(fEndLine.startCluster(), fEndLine.startPos());
     fClusters.startFrom(fEndLine.startCluster(), fEndLine.startPos());
     fClip.startFrom(fEndLine.startCluster(), fEndLine.startPos());
 
-    LineBreakerWithLittleRounding breaker(maxWidth, applyRoundingHack);
+    LineBreakerWithLittleRounding breaker(maxWidth, parent->getApplyRoundingHack());
     Cluster* nextNonBreakingSpace = nullptr;
+    // There could be some float from previous lines above
+    fCurrentLeftFloat = parent->getLeftFloat(fHeight);
+    fCurrentRightFloat = parent->getRightFloat(fHeight);
     for (auto cluster = fEndLine.endCluster(); cluster < endOfClusters; ++cluster) {
         if (cluster->isHardBreak()) {
         } else if (
                 // TODO: Trying to deal with flutter rounding problem. Must be removed...
-                SkScalar width = fWords.width() + fClusters.width() + cluster->width();
+                SkScalar width = fWords.width() + fClusters.width() + cluster->width() + fCurrentLeftFloat + fCurrentRightFloat;
                 breaker.breakLine(width)) {
             if (cluster->isWhitespaceBreak()) {
                 // It's the end of the word
@@ -78,12 +96,15 @@ void TextWrapper::lookAhead(SkScalar maxWidth, Cluster* endOfClusters, bool appl
                     fWords.extend(fClusters);
                 }
 
-                if (cluster->width() > maxWidth && fWords.empty()) {
+                if (cluster->width() > maxWidth && fWords.empty() && (fCurrentLeftFloat + fCurrentRightFloat) == 0) {
                     // Placeholder is the only text and it's longer than the line;
                     // it does not count in fMinIntrinsicWidth
                     fClusters.extend(cluster);
                     fTooLongCluster = true;
                     fTooLongWord = true;
+                    if (cluster->run().isFloatingPlaceholder()) {
+                        handleFloatingPlaceholder(maxWidth, cluster);
+                    }
                 } else {
                     // Placeholder does not fit the line; it will be considered again on the next line
                 }
@@ -102,7 +123,7 @@ void TextWrapper::lookAhead(SkScalar maxWidth, Cluster* endOfClusters, bool appl
                   break;
                 }
 
-                if (nextWordLength > 0 && nextWordLength <= maxWidth && further->isIntraWordBreak()) {
+                if (nextWordLength > 0 && nextWordLength <= (maxWidth - (fCurrentLeftFloat + fCurrentRightFloat)) && further->isIntraWordBreak()) {
                     // The cluster is spaces but not the end of the word in a normal sense
                     nextNonBreakingSpace = further;
                     nextShortWordLength = nextWordLength;
@@ -115,7 +136,7 @@ void TextWrapper::lookAhead(SkScalar maxWidth, Cluster* endOfClusters, bool appl
                     nextWordLength += further->width();
                 }
             }
-            if (nextWordLength > maxWidth) {
+            if (nextWordLength > (maxWidth - (fCurrentLeftFloat + fCurrentRightFloat))) {
                 if (nextNonBreakingSpace != nullptr) {
                     // We only get here if the non-breaking space improves our situation
                     // (allows us to break the text to fit the word)
@@ -152,6 +173,12 @@ void TextWrapper::lookAhead(SkScalar maxWidth, Cluster* endOfClusters, bool appl
         }
 
         if (cluster->run().isPlaceholder()) {
+            if (cluster->run().isFloatingPlaceholder() &&
+                ((cluster->run().placeholderFloating() == PlaceholderFloating::kLeft) ?
+                    fCurrentLeftFloat : fCurrentRightFloat) > 0) {
+                fHardLineBreak = true;
+                break;
+            }
             if (!fClusters.empty()) {
                 // Placeholder ends the previous word (placeholders are ignored in trimming)
                 fMinIntrinsicWidth = std::max(fMinIntrinsicWidth, getClustersTrimmedWidth());
@@ -161,6 +188,9 @@ void TextWrapper::lookAhead(SkScalar maxWidth, Cluster* endOfClusters, bool appl
             // Placeholder is separate word and its width now is counted in minIntrinsicWidth
             fMinIntrinsicWidth = std::max(fMinIntrinsicWidth, cluster->width());
             fWords.extend(cluster);
+            if (cluster->run().isFloatingPlaceholder()) {
+                handleFloatingPlaceholder(maxWidth, cluster);
+            }
         } else {
             fClusters.extend(cluster);
 
@@ -278,8 +308,11 @@ void TextWrapper::breakTextIntoLines(ParagraphImpl* parent,
                                      SkScalar maxWidth,
                                      const AddLineToParagraph& addLine) {
     fHeight = 0;
+    fHeightWithFloatingPlaceholders = 0;
     fMinIntrinsicWidth = std::numeric_limits<SkScalar>::min();
     fMaxIntrinsicWidth = std::numeric_limits<SkScalar>::min();
+    fSoftLineLeftFloatWidth = 0;
+    fSoftLineLeftFloatWidth = 0;
 
     auto span = parent->clusters();
     if (span.empty()) {
@@ -301,9 +334,57 @@ void TextWrapper::breakTextIntoLines(ParagraphImpl* parent,
     auto start = span.begin();
     InternalLineMetrics maxRunMetrics;
     bool needEllipsis = false;
+    SkScalar lineHeight = std::max(1.0f, parent->getEmptyMetrics().height());
     while (fEndLine.endCluster() != end) {
 
-        this->lookAhead(maxWidth, end, parent->getApplyRoundingHack());
+        this->lookAhead(maxWidth, end, parent);
+
+        if ((fWords.empty() && fClusters.empty() && (fCurrentLeftFloat + fCurrentRightFloat) > 0)) {
+            // The next cluster is a floating placeholder which can't be placed on this line.
+            // Need to skip lines until we can place it.
+            // TODO: Refactor this block
+            // Vertically-align any placeholders which finish in this line
+            for (auto& line : parent->lines()) {
+                line.iterateThroughClustersInGlyphsOrder(false, false,
+                    [&](const Cluster* cluster, ClusterIndex index, bool ghost) {
+                        if (cluster->run().isFloatingPlaceholder()) {
+                            SkScalar end = line.offset().fY + cluster->run().placeholderStyle()->fHeight;
+                            if (end > fHeight && end <= (fHeight + lineHeight)) {
+                                // This floating placeholder ends vertically within this current line
+                                switch (cluster->run().placeholderStyle()->fAlignment) {
+                                    case PlaceholderAlignment::kTop:
+                                        cluster->run().setOffset(cluster->run().offset().fX, 0);
+                                        cluster->run().setHeight(cluster->run().placeholderStyle()->fHeight);
+                                        break;
+                                    case PlaceholderAlignment::kMiddle:
+                                        cluster->run().setOffset(cluster->run().offset().fX, ((fHeight + lineHeight) - end) / 2);
+                                        cluster->run().setHeight(cluster->run().placeholderStyle()->fHeight);
+                                        break;
+                                    case PlaceholderAlignment::kBottom:
+                                        cluster->run().setOffset(cluster->run().offset().fX, (fHeight + lineHeight) - end);
+                                        cluster->run().setHeight(cluster->run().placeholderStyle()->fHeight);
+                                        break;
+                                    case PlaceholderAlignment::kStretchUp:
+                                        SkDebugf("Stretching to %f from %f\n", (fHeight + lineHeight) - line.offset().fY, cluster->run().placeholderStyle()->fHeight);
+                                        cluster->run().setHeight((fHeight + lineHeight) - line.offset().fY);
+                                        break;
+                                    default:
+                                        // Not implemented
+                                        break;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                );
+            }
+            fHeight += lineHeight;
+            ++fLineNumber;
+            continue;
+        } else if (fTooLongWord && (fCurrentLeftFloat + fCurrentRightFloat) > 0) {
+            // Don't break words because of floating placeholders
+            fTooLongWord = false;
+        }
 
         auto lastLine = (hasEllipsis && unlimitedLines) || fLineNumber >= maxLines;
         needEllipsis = hasEllipsis && !endlessLine && lastLine;
@@ -343,7 +424,9 @@ void TextWrapper::breakTextIntoLines(ParagraphImpl* parent,
                 SkASSERT(lastRun->size() == 1);
                 // Update the placeholder metrics so we can get the placeholder positions later
                 // and the line metrics (to make sure the placeholder fits)
-                lastRun->updateMetrics(&fEndLine.metrics());
+                if (!lastRun->isFloatingPlaceholder()) {
+                    lastRun->updateMetrics(&fEndLine.metrics());
+                }
             }
         }
 
@@ -375,7 +458,7 @@ void TextWrapper::breakTextIntoLines(ParagraphImpl* parent,
             parent->strutMetrics().updateLineMetrics(fEndLine.metrics());
         }
 
-        SkScalar lineHeight = fEndLine.metrics().height();
+        lineHeight = fEndLine.metrics().height();
         firstLine = false;
 
         if (fEndLine.empty()) {
@@ -392,17 +475,61 @@ void TextWrapper::breakTextIntoLines(ParagraphImpl* parent,
                 textIncludingNewlines, clusters, clustersWithGhosts, widthWithSpaces,
                 fEndLine.startPos(),
                 fEndLine.endPos(),
-                SkVector::Make(0, fHeight),
+                SkVector::Make(fCurrentLeftFloat, fHeight),
                 SkVector::Make(fEndLine.width(), lineHeight),
                 fEndLine.metrics(),
                 needEllipsis && !fHardLineBreak);
 
         softLineMaxIntrinsicWidth += widthWithSpaces;
 
-        fMaxIntrinsicWidth = std::max(fMaxIntrinsicWidth, softLineMaxIntrinsicWidth);
+        fMaxIntrinsicWidth = std::max(fMaxIntrinsicWidth, softLineMaxIntrinsicWidth + fSoftLineLeftFloatWidth + fSoftLineRightFloatWidth);
         if (fHardLineBreak) {
             softLineMaxIntrinsicWidth = 0;
+            fSoftLineLeftFloatWidth = 0;
+            fSoftLineRightFloatWidth = 0;
         }
+
+        // Vertically-align any placeholders which finish in this line
+        for (auto& line : parent->lines()) {
+            line.iterateThroughClustersInGlyphsOrder(false, false,
+                [&](const Cluster* cluster, ClusterIndex index, bool ghost) {
+                    auto run = cluster->runOrNull();
+                    if (!run) {
+                        // Skip
+                        return true;
+                    }
+                    if (run->isFloatingPlaceholder()) {
+                        SkScalar end = line.offset().fY + run->placeholderStyle()->fHeight;
+                        if (end > fHeight && end <= (fHeight + lineHeight)) {
+                            // This floating placeholder ends vertically within this current line
+                            switch (run->placeholderStyle()->fAlignment) {
+                                case PlaceholderAlignment::kTop:
+                                    run->setOffset(run->offset().fX, 0);
+                                    run->setHeight(run->placeholderStyle()->fHeight);
+                                    break;
+                                case PlaceholderAlignment::kMiddle:
+                                    run->setOffset(run->offset().fX, ((fHeight + lineHeight) - end) / 2);
+                                    run->setHeight(run->placeholderStyle()->fHeight);
+                                    break;
+                                case PlaceholderAlignment::kBottom:
+                                    run->setOffset(run->offset().fX, (fHeight + lineHeight) - end);
+                                    run->setHeight(run->placeholderStyle()->fHeight);
+                                    break;
+                                case PlaceholderAlignment::kStretchUp:
+                                    SkDebugf("Stretching to %f from %f\n", (fHeight + lineHeight) - line.offset().fY, run->placeholderStyle()->fHeight);
+                                    run->setHeight((fHeight + lineHeight) - line.offset().fY);
+                                    break;
+                                default:
+                                    // Not implemented
+                                    break;
+                            }
+                        }
+                    }
+                    return true;
+                }
+            );
+        }
+
         // Start a new line
         fHeight += lineHeight;
         if (!fHardLineBreak || startLine != end) {
@@ -511,6 +638,30 @@ void TextWrapper::breakTextIntoLines(ParagraphImpl* parent,
     if (disableLastDescent) {
         parent->lines().back().setDescentStyle(LineMetricStyle::Typographic);
     }
+
+    // Set paragraph height properly in case a floating placeholder extends below the last line of text
+    for (auto& line : parent->lines()) {
+        line.iterateThroughClustersInGlyphsOrder(false, false,
+            [&](const Cluster* cluster, ClusterIndex index, bool ghost) {
+                auto run = cluster->runOrNull();
+                if (!run) {
+                    // Skip
+                    return true;
+                }
+                if (run->isFloatingPlaceholder()) {
+                    SkScalar end = line.offset().fY + run->placeholderStyle()->fHeight;
+                    if (end > fHeight) {
+                        // This floating placeholder ends below all the text lines
+                        run->setOffset(run->offset().fX, 0);
+                        run->setHeight(run->placeholderStyle()->fHeight);
+                    }
+                }
+                return true;
+            }
+        );
+    }
+    fHeight = std::max(fHeight, fHeightWithFloatingPlaceholders);
+    // TODO(Callum): Clear vertical align for terminal floating placeholders in case they had vertical align from a previous layout() call
 }
 
 }  // namespace textlayout

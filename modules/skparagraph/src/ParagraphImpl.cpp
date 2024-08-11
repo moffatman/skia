@@ -522,7 +522,8 @@ void ParagraphImpl::buildClusterTable() {
               fClustersIndexFromCodeUnit[i] = fClusters.size();
             }
             // There are no glyphs but we want to have one cluster
-            fClusters.emplace_back(this, runIndex, 0ul, 1ul, this->text(run.textRange()), run.advance().fX, run.advance().fY);
+            SkVector size = run.isFloatingPlaceholder() ? SkVector::Make(run.placeholderStyle()->fWidth, run.placeholderStyle()->fHeight) : run.advance();
+            fClusters.emplace_back(this, runIndex, 0ul, 1ul, this->text(run.textRange()), size.fX, size.fY);
             fCodeUnitProperties[run.textRange().start] |= SkUnicode::CodeUnitFlags::kSoftLineBreakBefore;
             fCodeUnitProperties[run.textRange().end] |= SkUnicode::CodeUnitFlags::kSoftLineBreakBefore;
         } else {
@@ -653,9 +654,9 @@ void ParagraphImpl::breakShapedTextIntoLines(SkScalar maxWidth) {
                 // TODO: Take in account clipped edges
                 auto& line = this->addLine(offset, advance, textExcludingSpaces, text, textWithNewlines, clusters, clustersWithGhosts, widthWithSpaces, metrics);
                 if (addEllipsis) {
-                    line.createEllipsis(maxWidth, this->getEllipsis(), true);
+                    line.createEllipsis(maxWidth - (offset.fX + getRightFloat(offset.fY)), this->getEllipsis(), true);
                 }
-                fLongestLine = std::max(fLongestLine, nearlyZero(advance.fX) ? widthWithSpaces : advance.fX);
+                fLongestLine = std::max(fLongestLine, getLeftFloat(offset.fY) + getRightFloat(offset.fY) + (nearlyZero(advance.fX) ? widthWithSpaces : advance.fX));
             });
 
     fHeight = textWrapper.height();
@@ -680,7 +681,7 @@ void ParagraphImpl::formatLines(SkScalar maxWidth) {
     }
 
     for (auto& line : fLines) {
-        line.format(effectiveAlign, maxWidth);
+        line.format(effectiveAlign, maxWidth - (getLeftFloat(line.offset().fY) + getRightFloat(line.offset().fY)));
     }
 }
 
@@ -1558,6 +1559,40 @@ bool ParagraphImpl::containsColorFontOrBitmap(SkTextBlob* textBlob) {
         iter.next();
     }
     return flag;
+}
+
+SkScalar ParagraphImpl::getRightFloat(SkScalar y) {
+    for (auto& line : fLines) {
+        for (auto c = line.clustersWithSpaces().start; c < line.clustersWithSpaces().end; ++c) {
+            auto& cluster = fClusters[c];
+            PlaceholderFloating floating = cluster.run().placeholderFloating();
+            if (floating == PlaceholderFloating::kRight) {
+                SkScalar start = line.offset().fY + cluster.run().offset().fY;
+                SkScalar end = start + cluster.run().placeholderStyle()->fHeight;
+                if (y >= start && y < end) {
+                    return cluster.run().placeholderStyle()->fWidth;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+SkScalar ParagraphImpl::getLeftFloat(SkScalar y) {
+    for (auto& line : fLines) {
+        for (auto c = line.clustersWithSpaces().start; c < line.clustersWithSpaces().end; ++c) {
+            auto& cluster = fClusters[c];
+            PlaceholderFloating floating = cluster.run().placeholderFloating();
+            if (floating == PlaceholderFloating::kLeft) {
+                SkScalar start = line.offset().fY + cluster.run().offset().fY;
+                SkScalar end = start + cluster.run().placeholderStyle()->fHeight;
+                if (y >= start && y < end) {
+                    return cluster.run().placeholderStyle()->fWidth;
+                }
+            }
+        }
+    }
+    return 0;
 }
 
 }  // namespace textlayout

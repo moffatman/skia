@@ -478,7 +478,9 @@ void TextLine::justify(SkScalar maxWidth) {
                 whitespacePatch = false;
                 leadingWhitespaces = false;
             }
-            textLen += cluster->width();
+            if (!cluster->run().isFloatingPlaceholder()) {
+                textLen += cluster->width();
+            }
             return true;
         });
 
@@ -947,6 +949,9 @@ SkScalar TextLine::iterateThroughSingleRunByStyles(TextAdjustment textAdjustment
                                                    TextRange textRange,
                                                    StyleType styleType,
                                                    const RunStyleVisitor& visitor) const {
+    /*if (run->isFloatingPlaceholder()) {
+        return 0;
+    }*/
     auto correctContext = [&](TextRange textRange, SkScalar textOffsetInRun) -> ClipContext {
         auto result = this->measureTextInsideOneRun(
                 textRange, run, runOffset, textOffsetInRun, false, textAdjustment);
@@ -1524,7 +1529,15 @@ void TextLine::getRectsForPlaceholders(std::vector<TextBox>& boxes) {
             }
 
             SkRect clip = context.clip;
-            clip.offset(this->offset());
+            if (run->isFloatingPlaceholder()) {
+                if (run->placeholderFloating() == PlaceholderFloating::kLeft) {
+                    clip = SkRect::MakeXYWH(0, fOffset.fY + run->offset().fY, run->placeholderStyle()->fWidth, run->advance().fY);
+                } else {
+                    clip = SkRect::MakeXYWH(fOwner->getMaxWidth() - run->placeholderStyle()->fWidth, fOffset.fY + run->offset().fY, run->placeholderStyle()->fWidth, run->advance().fY);
+                }
+            } else {
+                clip.offset(this->offset());
+            }
 
             if (fOwner->getApplyRoundingHack()) {
                 clip.fLeft = littleRound(clip.fLeft);

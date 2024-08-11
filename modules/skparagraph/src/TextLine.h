@@ -136,6 +136,7 @@ public:
     SkRect extendHeight(const ClipContext& context) const;
 
     void shiftVertically(SkScalar shift) { fOffset.fY += shift; }
+    void shiftHorizontally(SkScalar shift) { fOffset.fX += shift; }
 
     void setAscentStyle(LineMetricStyle style) { fAscentStyle = style; }
     void setDescentStyle(LineMetricStyle style) { fDescentStyle = style; }
