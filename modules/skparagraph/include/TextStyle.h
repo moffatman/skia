@@ -110,6 +110,17 @@ enum class PlaceholderAlignment {
   /// placeholder is very tall, the extra space will grow equally from
   /// the top and bottom of the line.
   kMiddle,
+
+  // TODO
+  kStretchUp,
+};
+
+enum class PlaceholderFloating {
+  kNone,
+  kLeft,
+  kRight,
+  kStart,
+  kEnd,
 };
 
 struct FontFeature {
@@ -124,12 +135,13 @@ struct FontFeature {
 struct PlaceholderStyle {
     PlaceholderStyle() = default;
     PlaceholderStyle(SkScalar width, SkScalar height, PlaceholderAlignment alignment,
-                     TextBaseline baseline, SkScalar offset)
+                     TextBaseline baseline, SkScalar offset, PlaceholderFloating floating)
             : fWidth(width)
             , fHeight(height)
             , fAlignment(alignment)
             , fBaseline(baseline)
-            , fBaselineOffset(offset) {}
+            , fBaselineOffset(offset)
+            , fFloating(floating) {}
 
     bool equals(const PlaceholderStyle&) const;
 
@@ -146,6 +158,7 @@ struct PlaceholderStyle {
     // the line. When baseline == height, the bottom edge of the rect will rest on
     // the alphabetic baseline.
     SkScalar fBaselineOffset = 0;
+    PlaceholderFloating fFloating = PlaceholderFloating::kNone;
 };
 
 class TextStyle {

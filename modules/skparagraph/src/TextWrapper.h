@@ -85,7 +85,9 @@ class TextWrapper {
                 // We ignore metrics for \n as the Flutter does
                 fMetrics.add(&r);
             }
-            fWidth += cluster->width();
+            if (!r.isFloatingPlaceholder()) {
+                fWidth += cluster->width();
+            }
         }
 
         void extend(Cluster* cluster, size_t pos) {
@@ -203,6 +205,11 @@ private:
     SkScalar fHeight;
     SkScalar fMinIntrinsicWidth;
     SkScalar fMaxIntrinsicWidth;
+    SkScalar fSoftLineLeftFloatWidth;
+    SkScalar fSoftLineRightFloatWidth;
+    SkScalar fHeightWithFloatingPlaceholders;
+    SkScalar fCurrentLeftFloat;
+    SkScalar fCurrentRightFloat;
 
     void reset() {
         fWords.clean();
@@ -213,7 +220,8 @@ private:
         fHardLineBreak = false;
     }
 
-    void lookAhead(SkScalar maxWidth, Cluster* endOfClusters, bool applyRoundingHack);
+    void handleFloatingPlaceholder(SkScalar maxWidth, Cluster* cluster);
+    void lookAhead(SkScalar maxWidth, Cluster* endOfClusters, ParagraphImpl* parent);
     void moveForward(bool hasEllipsis);
     void trimEndSpaces(TextAlign align);
     std::tuple<Cluster*, size_t, SkScalar> trimStartSpaces(Cluster* endOfClusters);

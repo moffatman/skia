@@ -394,12 +394,12 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderParagraph, reporter) {
     builder.pushStyle(text_style);
     builder.addText(text, len);
 
-    PlaceholderStyle placeholder1(50, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 0);
+    PlaceholderStyle placeholder1(50, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 0, PlaceholderFloating::kNone);
     builder.addPlaceholder(placeholder1);
     builder.addText(text, len);
     builder.addPlaceholder(placeholder1);
 
-    PlaceholderStyle placeholder2(5, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 50);
+    PlaceholderStyle placeholder2(5, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 50, PlaceholderFloating::kNone);
     builder.addPlaceholder(placeholder2);
     builder.addPlaceholder(placeholder1);
     builder.addPlaceholder(placeholder2);
@@ -494,7 +494,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderBaselineParagraph, reporter) {
     builder.pushStyle(text_style);
     builder.addText(text, len);
 
-    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 38.347f);
+    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 38.347f, PlaceholderFloating::kNone);
     builder.addPlaceholder(placeholder);
     builder.addText(text, len);
 
@@ -554,7 +554,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderAboveBaselineParagraph, reporter) {
     builder.pushStyle(text_style);
     builder.addText(text, len);
 
-    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kAboveBaseline, TextBaseline::kAlphabetic, 903129.129308f);
+    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kAboveBaseline, TextBaseline::kAlphabetic, 903129.129308f, PlaceholderFloating::kNone);
     builder.addPlaceholder(placeholder);
     builder.addText(text, len);
 
@@ -614,7 +614,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderBelowBaselineParagraph, reporter) {
     builder.pushStyle(text_style);
     builder.addText(text, len);
 
-    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kBelowBaseline, TextBaseline::kAlphabetic, 903129.129308f);
+    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kBelowBaseline, TextBaseline::kAlphabetic, 903129.129308f, PlaceholderFloating::kNone);
     builder.addPlaceholder(placeholder);
     builder.addText(text, len);
 
@@ -674,7 +674,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderBottomParagraph, reporter) {
     builder.pushStyle(text_style);
     builder.addText(text, len);
 
-    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kBottom, TextBaseline::kAlphabetic, 0);
+    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kBottom, TextBaseline::kAlphabetic, 0, PlaceholderFloating::kNone);
     builder.addPlaceholder(placeholder);
     builder.addText(text, len);
 
@@ -732,7 +732,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderTopParagraph, reporter) {
     builder.pushStyle(text_style);
     builder.addText(text, len);
 
-    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kTop, TextBaseline::kAlphabetic, 0);
+    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kTop, TextBaseline::kAlphabetic, 0, PlaceholderFloating::kNone);
     builder.addPlaceholder(placeholder);
     builder.addText(text, len);
 
@@ -790,7 +790,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderMiddleParagraph, reporter) {
     builder.pushStyle(text_style);
     builder.addText(text, len);
 
-    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kMiddle, TextBaseline::kAlphabetic, 0);
+    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kMiddle, TextBaseline::kAlphabetic, 0, PlaceholderFloating::kNone);
     builder.addPlaceholder(placeholder);
     builder.addText(text, len);
 
@@ -847,7 +847,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderIdeographicBaselineParagraph, report
     text_style.setDecorationColor(SK_ColorBLACK);
     builder.pushStyle(text_style);
     builder.addText(text, len);
-    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kBaseline, TextBaseline::kIdeographic, 38.347f);
+    PlaceholderStyle placeholder(55, 50, PlaceholderAlignment::kBaseline, TextBaseline::kIdeographic, 38.347f, PlaceholderFloating::kNone);
     builder.addPlaceholder(placeholder);
     builder.addText(text, len);
 
@@ -905,8 +905,8 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderBreakParagraph, reporter) {
     builder.pushStyle(text_style);
     builder.addText(text, len);
 
-    PlaceholderStyle placeholder1(50, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 50);
-    PlaceholderStyle placeholder2(25, 25, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 12.5f);
+    PlaceholderStyle placeholder1(50, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 50, PlaceholderFloating::kNone);
+    PlaceholderStyle placeholder2(25, 25, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 12.5f, PlaceholderFloating::kNone);
 
     builder.addPlaceholder(placeholder1);
     builder.addPlaceholder(placeholder1);
@@ -1044,8 +1044,8 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderGetRectsParagraph, reporter) {
     builder.pushStyle(text_style);
     builder.addText(text, len);
 
-    PlaceholderStyle placeholder1(50, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 50);
-    PlaceholderStyle placeholder2(5, 20, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 10);
+    PlaceholderStyle placeholder1(50, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 50, PlaceholderFloating::kNone);
+    PlaceholderStyle placeholder2(5, 20, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 10, PlaceholderFloating::kNone);
 
     builder.addPlaceholder(placeholder1);
     builder.addPlaceholder(placeholder1);
@@ -5670,7 +5670,7 @@ UNIX_ONLY_TEST(SkParagraph_PlaceholderOnly, reporter) {
     text_style.setBackgroundColor(SkPaint(SkColors::kRed));
     ParagraphBuilderImpl builder(paragraph_style, fontCollection, get_unicode());
 
-    PlaceholderStyle placeholder(0, 0, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 0);
+    PlaceholderStyle placeholder(0, 0, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 0, PlaceholderFloating::kNone);
     builder.addPlaceholder(placeholder);
 
     auto paragraph = builder.Build();
@@ -6617,7 +6617,7 @@ UNIX_ONLY_TEST(SkParagraph_PlaceholderWidth, reporter) {
     text_style.setColor(SK_ColorBLACK);
     text_style.setFontSize(50);
     text_style.setFontFamilies({SkString("Ahem")});
-    PlaceholderStyle placeholder(300, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 0);
+    PlaceholderStyle placeholder(300, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 0, PlaceholderFloating::kNone);
 
     auto draw = [&](bool withPlaceholder) {
         ParagraphBuilderImpl builder(paragraph_style, fontCollection, get_unicode());
@@ -8980,3 +8980,152 @@ UNIX_ONLY_TEST(SkParagraph_ICU4X_EmojiRuns, reporter) {
     SkUnicode_Emoji(SkUnicodes::ICU4X::Make(), reporter);
 }
 #endif
+
+UNIX_ONLY_TEST(SkParagraph_FloatingPlaceholder, reporter) {
+    sk_sp<ResourceFontCollection> fontCollection = sk_make_sp<ResourceFontCollection>();
+    TestCanvas canvas("SkParagraph_FloatingPlaceholder.png");
+    if (!fontCollection->fontsFound()) return;
+
+    const char* text = "line1.1 line1.1 line1.2 line1.3 line1.4 line1.5 line1.6 line1.7 line1.8 line1.9\nline2";
+    const size_t len = strlen(text);
+
+    ParagraphStyle paragraph_style;
+    ParagraphBuilderImpl builder(paragraph_style, fontCollection);
+
+    TextStyle text_style;
+    text_style.setFontFamilies({SkString("Roboto")});
+    text_style.setColor(SK_ColorBLACK);
+    text_style.setFontSize(26);
+    text_style.setWordSpacing(5);
+    text_style.setLetterSpacing(1);
+    text_style.setDecoration(TextDecoration::kUnderline);
+    text_style.setDecorationColor(SK_ColorBLACK);
+    builder.pushStyle(text_style);
+
+    PlaceholderStyle placeholder1(50, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 0, PlaceholderFloating::kLeft);
+    PlaceholderStyle placeholder2(100, 100, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 0, PlaceholderFloating::kRight);
+
+    builder.addPlaceholder(placeholder1);
+    builder.addPlaceholder(placeholder2);
+    builder.addText(text, len);
+    builder.addPlaceholder(placeholder1);
+
+    builder.pop();
+
+    auto paragraph = builder.Build();
+    paragraph->layout(TestCanvasWidth);
+    paragraph->paint(canvas.get(), 0, 0);
+
+    RectHeightStyle rect_height_style = RectHeightStyle::kMax;
+    RectWidthStyle rect_width_style = RectWidthStyle::kTight;
+
+    auto boxes = paragraph->getRectsForPlaceholders();
+    canvas.drawRects(SK_ColorRED, boxes);
+
+    REPORTER_ASSERT(reporter, boxes.size() == 3);
+    SkDebugf("boxes size %ld\n", boxes.size());
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.left(), 0, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.top(), 0, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.right(), 50, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.bottom(), 50, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[1].rect.left(), 900, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[1].rect.top(), 0, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[1].rect.right(), 1000, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[1].rect.bottom(), 100, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[2].rect.left(), 0, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[2].rect.top(), 60, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[2].rect.right(), 50, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[2].rect.bottom(), 110, EPSILON100));
+
+    boxes = paragraph->getRectsForRange(0, 6, rect_height_style, rect_width_style);
+    canvas.drawRects(SK_ColorBLUE, boxes);
+
+    SkDebugf("boxes size %ld\n", boxes.size());
+    SkDebugf("boxes[0] ltrb %f,%f,%f,%f\n", boxes[0].rect.left(), boxes[0].rect.top(), boxes[0].rect.right(), boxes[0].rect.bottom());
+    REPORTER_ASSERT(reporter, boxes.size() == 1);
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.left(), 50.5, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.top(), -0.47, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.right(), 95.24, EPSILON50));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.bottom(), 30, EPSILON100));
+
+    SkDebugf("minI: %f, maxI: %f, h: %f\n", paragraph->getMinIntrinsicWidth(), paragraph->getMaxIntrinsicWidth(), paragraph->getHeight());
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(paragraph->getMinIntrinsicWidth(), 100, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(paragraph->getMaxIntrinsicWidth(), 1149.74, EPSILON50));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(paragraph->getHeight(), 110, EPSILON100));
+}
+
+UNIX_ONLY_TEST(SkParagraph_FloatingPlaceholderQueue, reporter) {
+    sk_sp<ResourceFontCollection> fontCollection = sk_make_sp<ResourceFontCollection>();
+    TestCanvas canvas("SkParagraph_FloatingPlaceholderQueue.png");
+    if (!fontCollection->fontsFound()) return;
+
+    const char* text = "asdf";
+    const size_t len = strlen(text);
+
+    ParagraphStyle paragraph_style;
+    ParagraphBuilderImpl builder(paragraph_style, fontCollection);
+
+    TextStyle text_style;
+    text_style.setFontFamilies({SkString("Roboto")});
+    text_style.setColor(SK_ColorBLACK);
+    text_style.setFontSize(26);
+    text_style.setWordSpacing(5);
+    text_style.setLetterSpacing(1);
+    text_style.setDecoration(TextDecoration::kUnderline);
+    text_style.setDecorationColor(SK_ColorBLACK);
+    builder.pushStyle(text_style);
+
+    PlaceholderStyle placeholder1(600, 50, PlaceholderAlignment::kBaseline, TextBaseline::kAlphabetic, 0, PlaceholderFloating::kLeft);
+
+    builder.addPlaceholder(placeholder1);
+    builder.addPlaceholder(placeholder1);
+    builder.addText(text, len);
+
+    builder.pop();
+
+    auto paragraph = builder.Build();
+    paragraph->layout(TestCanvasWidth);
+    paragraph->paint(canvas.get(), 0, 0);
+
+    RectHeightStyle rect_height_style = RectHeightStyle::kMax;
+    RectWidthStyle rect_width_style = RectWidthStyle::kTight;
+
+    auto boxes = paragraph->getRectsForPlaceholders();
+    canvas.drawRects(SK_ColorRED, boxes);
+
+    REPORTER_ASSERT(reporter, boxes.size() == 3);
+    SkDebugf("boxes size %ld\n", boxes.size());
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.left(), 0, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.top(), 0, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.right(), 50, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.bottom(), 50, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[1].rect.left(), 900, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[1].rect.top(), 0, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[1].rect.right(), 1000, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[1].rect.bottom(), 100, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[2].rect.left(), 0, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[2].rect.top(), 60, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[2].rect.right(), 50, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[2].rect.bottom(), 110, EPSILON100));
+
+    boxes = paragraph->getRectsForRange(0, 6, rect_height_style, rect_width_style);
+    canvas.drawRects(SK_ColorBLUE, boxes);
+
+    SkDebugf("boxes size %ld\n", boxes.size());
+    SkDebugf("boxes[0] ltrb %f,%f,%f,%f\n", boxes[0].rect.left(), boxes[0].rect.top(), boxes[0].rect.right(), boxes[0].rect.bottom());
+    REPORTER_ASSERT(reporter, boxes.size() == 1);
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.left(), 50.5, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.top(), -0.47, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.right(), 95.24, EPSILON50));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.bottom(), 30, EPSILON100));
+
+    SkDebugf("minI: %f, maxI: %f, h: %f\n", paragraph->getMinIntrinsicWidth(), paragraph->getMaxIntrinsicWidth(), paragraph->getHeight());
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(paragraph->getMinIntrinsicWidth(), 100, EPSILON100));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(paragraph->getMaxIntrinsicWidth(), 1149.74, EPSILON50));
+    REPORTER_ASSERT(reporter, SkScalarNearlyEqual(paragraph->getHeight(), 110, EPSILON100));
+}
+
+
+// TODO: Test queue
+// TODO: Test clipping
+// TODO: Test/fix the squeezed text not starting at y=0

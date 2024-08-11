@@ -200,7 +200,8 @@ bool PlaceholderStyle::equals(const PlaceholderStyle& other) const {
            fAlignment == other.fAlignment &&
            fBaseline == other.fBaseline &&
            (fAlignment != PlaceholderAlignment::kBaseline ||
-            nearlyEqual(fBaselineOffset, other.fBaselineOffset));
+            nearlyEqual(fBaselineOffset, other.fBaselineOffset)) &&
+           fFloating == other.fFloating;
 }
 
 }  // namespace textlayout

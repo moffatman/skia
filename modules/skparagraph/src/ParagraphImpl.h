@@ -245,6 +245,8 @@ public:
     }
 
     sk_sp<SkUnicode> getUnicode() { return fUnicode; }
+    SkScalar getLeftFloat(SkScalar y);
+    SkScalar getRightFloat(SkScalar y);
 
 private:
     friend class ParagraphBuilder;
