@@ -443,8 +443,8 @@ void TextWrapper::breakTextIntoLines(ParagraphImpl* parent,
             textIncludingNewlines.end = parent->text().size();
             text.end = parent->text().size();
         }
-        ClusterRange clusters(fEndLine.startCluster() - start, fEndLine.endCluster() - start + 1);
-        ClusterRange clustersWithGhosts(fEndLine.startCluster() - start, startLine - start);
+        ClusterRange clusters(fEndLine.startCluster() - start, fEndLine.endCluster() - start + fEndLine.endCluster()->size());
+        ClusterRange clustersWithGhosts(fEndLine.startCluster() - start, startLine - start + startLine->size());
 
         if (disableFirstAscent && firstLine) {
             fEndLine.metrics().fAscent = fEndLine.metrics().fRawAscent;

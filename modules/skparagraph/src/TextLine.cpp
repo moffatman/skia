@@ -922,6 +922,10 @@ void TextLine::iterateThroughClustersInGlyphsOrder(bool reversed,
     directional_for_each(runs, !reversed, [&](decltype(runs[0]) r) {
         if (ignore) return;
         auto run = this->fOwner->run(r);
+        if (!fClusterRange.intersects(run.clusterRange()) || !fGhostClusterRange.intersects(run.clusterRange())) {
+            // Ellipsizing broke fRunsInVisualOrder, just skip
+            return;
+        }
         auto trimmedRange = fClusterRange.intersection(run.clusterRange());
         auto trailedRange = fGhostClusterRange.intersection(run.clusterRange());
         SkASSERT(trimmedRange.start == trailedRange.start);
