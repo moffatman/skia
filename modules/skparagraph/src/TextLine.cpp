@@ -1538,7 +1538,7 @@ void TextLine::getRectsForPlaceholders(std::vector<TextBox>& boxes) {
                 if (run->placeholderFloating() == PlaceholderFloating::kLeft) {
                     clip = SkRect::MakeXYWH(0, fOffset.fY + run->offset().fY, run->placeholderStyle()->fWidth, run->advance().fY);
                 } else {
-                    clip = SkRect::MakeXYWH(fOwner->getMaxWidth() - run->placeholderStyle()->fWidth, fOffset.fY + run->offset().fY, run->placeholderStyle()->fWidth, run->advance().fY);
+                    clip = SkRect::MakeXYWH(fOwner->getLongestLine() - run->placeholderStyle()->fWidth, fOffset.fY + run->offset().fY, run->placeholderStyle()->fWidth, run->advance().fY);
                 }
             } else {
                 clip.offset(this->offset());
