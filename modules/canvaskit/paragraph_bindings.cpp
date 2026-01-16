@@ -335,8 +335,8 @@ Float32Array GetRectsForRange(para::Paragraph& self,
     return TextBoxesToFloat32Array(boxes);
 }
 
-Float32Array GetRectsForPlaceholders(para::Paragraph& self) {
-    std::vector<para::TextBox> boxes = self.getRectsForPlaceholders();
+Float32Array GetRectsForPlaceholders(para::Paragraph& self, SkScalar width) {
+    std::vector<para::TextBox> boxes = self.getRectsForPlaceholders(width);
     return TextBoxesToFloat32Array(boxes);
 }
 

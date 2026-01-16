@@ -10,11 +10,11 @@
       return floatArrayToRects(floatArray);
     }
 
-    CanvasKit.Paragraph.prototype.getRectsForPlaceholders = function() {
+    CanvasKit.Paragraph.prototype.getRectsForPlaceholders = function(width) {
         /**
         * @type {Float32Array}
         */
-        var floatArray = this._getRectsForPlaceholders();
+        var floatArray = this._getRectsForPlaceholders(width);
         return floatArrayToRects(floatArray);
     }
 

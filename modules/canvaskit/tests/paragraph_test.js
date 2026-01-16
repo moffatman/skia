@@ -506,7 +506,7 @@ describe('Paragraph Behavior', function() {
         const paragraph = builder.build();
         paragraph.layout(300);
 
-        let rects = paragraph.getRectsForPlaceholders();
+        let rects = paragraph.getRectsForPlaceholders(300);
         canvas.drawParagraph(paragraph, 10, 10);
 
         for (const r of rects) {

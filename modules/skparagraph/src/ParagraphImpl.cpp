@@ -867,7 +867,7 @@ std::vector<TextBox> ParagraphImpl::getRectsForRange(unsigned start,
     return results;
 }
 
-std::vector<TextBox> ParagraphImpl::getRectsForPlaceholders() {
+std::vector<TextBox> ParagraphImpl::getRectsForPlaceholders(SkScalar width) {
   std::vector<TextBox> boxes;
   if (fText.isEmpty()) {
        return boxes;
@@ -877,7 +877,7 @@ std::vector<TextBox> ParagraphImpl::getRectsForPlaceholders() {
        return boxes;
   }
   for (auto& line : fLines) {
-      line.getRectsForPlaceholders(boxes);
+      line.getRectsForPlaceholders(boxes, width);
   }
   /*
   SkDebugf("getRectsForPlaceholders('%s'): %d\n", fText.c_str(), boxes.size());
