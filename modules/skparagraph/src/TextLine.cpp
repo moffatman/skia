@@ -1517,10 +1517,10 @@ PositionWithAffinity TextLine::getGlyphPositionAtCoordinate(SkScalar dx) {
     return result;
 }
 
-void TextLine::getRectsForPlaceholders(std::vector<TextBox>& boxes) {
+void TextLine::getRectsForPlaceholders(std::vector<TextBox>& boxes, SkScalar paragraphWidth) {
     this->iterateThroughVisualRuns(
         true,
-        [&boxes, this](const Run* run, SkScalar runOffset, TextRange textRange,
+        [&boxes, paragraphWidth, this](const Run* run, SkScalar runOffset, TextRange textRange,
                         SkScalar* width) {
                 auto context = this->measureTextInsideOneRun(
                         textRange, run, runOffset, 0, true, TextAdjustment::GraphemeGluster);
@@ -1538,7 +1538,7 @@ void TextLine::getRectsForPlaceholders(std::vector<TextBox>& boxes) {
                 if (run->placeholderFloating() == PlaceholderFloating::kLeft) {
                     clip = SkRect::MakeXYWH(0, fOffset.fY + run->offset().fY, run->placeholderStyle()->fWidth, run->advance().fY);
                 } else {
-                    clip = SkRect::MakeXYWH(fOwner->getLongestLine() - run->placeholderStyle()->fWidth, fOffset.fY + run->offset().fY, run->placeholderStyle()->fWidth, run->advance().fY);
+                    clip = SkRect::MakeXYWH(paragraphWidth - run->placeholderStyle()->fWidth, fOffset.fY + run->offset().fY, run->placeholderStyle()->fWidth, run->advance().fY);
                 }
             } else {
                 clip.offset(this->offset());

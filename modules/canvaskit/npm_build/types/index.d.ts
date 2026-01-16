@@ -1131,7 +1131,7 @@ export interface Paragraph extends EmbindObject<"Paragraph"> {
      * Returns the total number of visible lines in the paragraph.
      */
     getNumberOfLines(): number;
-    getRectsForPlaceholders(): RectWithDirection[];
+    getRectsForPlaceholders(width: number): RectWithDirection[];
 
     /**
      * Returns bounding boxes that enclose all text in the range of glpyh indexes [start, end).

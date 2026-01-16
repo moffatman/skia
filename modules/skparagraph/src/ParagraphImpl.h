@@ -112,7 +112,7 @@ public:
                                           unsigned end,
                                           RectHeightStyle rectHeightStyle,
                                           RectWidthStyle rectWidthStyle) override;
-    std::vector<TextBox> getRectsForPlaceholders() override;
+    std::vector<TextBox> getRectsForPlaceholders(SkScalar width) override;
     void getLineMetrics(std::vector<LineMetrics>&) override;
     PositionWithAffinity getGlyphPositionAtCoordinate(SkScalar dx, SkScalar dy) override;
     SkRange<size_t> getWordBoundary(unsigned offset) override;

@@ -121,7 +121,7 @@ public:
                           RectHeightStyle rectHeightStyle,
                           RectWidthStyle rectWidthStyle,
                           std::vector<TextBox>& boxes) const;
-    void getRectsForPlaceholders(std::vector<TextBox>& boxes);
+    void getRectsForPlaceholders(std::vector<TextBox>& boxes, SkScalar paragraphWidth);
     PositionWithAffinity getGlyphPositionAtCoordinate(SkScalar dx);
 
     ClipContext measureTextInsideOneRun(TextRange textRange,

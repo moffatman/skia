@@ -552,7 +552,7 @@ function paragraphTests(CK: CanvasKit, p?: Paragraph) {
     const g = p.getMaxIntrinsicWidth(); // $ExpectType number
     const h = p.getMaxWidth(); // $ExpectType number
     const i = p.getMinIntrinsicWidth(); // $ExpectType number
-    const j = p.getRectsForPlaceholders(); // $ExpectType RectWithDirection[]
+    const j = p.getRectsForPlaceholders(h); // $ExpectType RectWithDirection[]
     const k = p.getRectsForRange(2, 10, CK.RectHeightStyle.Max,  // $ExpectType RectWithDirection[]
         CK.RectWidthStyle.Tight);
     j[0].rect.length === 4;

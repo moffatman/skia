@@ -439,7 +439,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderParagraph, reporter) {
     canvas.drawRects(SK_ColorGREEN, boxes);
     REPORTER_ASSERT(reporter, boxes.size() == 1);
 
-    boxes = paragraph->getRectsForPlaceholders();
+    boxes = paragraph->getRectsForPlaceholders(TestCanvasWidth);
     canvas.drawRects(SK_ColorRED, boxes);
 
     boxes = paragraph->getRectsForRange(4, 17, rect_height_style, rect_width_style);
@@ -503,7 +503,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderBaselineParagraph, reporter) {
     paragraph->layout(TestCanvasWidth);
     paragraph->paint(canvas.get(), 0, 0);
 
-    auto boxes = paragraph->getRectsForPlaceholders();
+    auto boxes = paragraph->getRectsForPlaceholders(TestCanvasWidth);
     canvas.drawRects(SK_ColorRED, boxes);
 
     REPORTER_ASSERT(reporter, boxes.size() == 1);
@@ -563,7 +563,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderAboveBaselineParagraph, reporter) {
     paragraph->layout(TestCanvasWidth);
     paragraph->paint(canvas.get(), 0, 0);
 
-    auto boxes = paragraph->getRectsForPlaceholders();
+    auto boxes = paragraph->getRectsForPlaceholders(TestCanvasWidth);
     canvas.drawRects(SK_ColorRED, boxes);
 
     REPORTER_ASSERT(reporter, boxes.size() == 1);
@@ -623,7 +623,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderBelowBaselineParagraph, reporter) {
     paragraph->layout(TestCanvasWidth);
     paragraph->paint(canvas.get(), 0, 0);
 
-    auto boxes = paragraph->getRectsForPlaceholders();
+    auto boxes = paragraph->getRectsForPlaceholders(TestCanvasWidth);
     canvas.drawRects(SK_ColorRED, boxes);
 
     REPORTER_ASSERT(reporter, boxes.size() == 1);
@@ -686,7 +686,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderBottomParagraph, reporter) {
     RectHeightStyle rect_height_style = RectHeightStyle::kTight;
     RectWidthStyle rect_width_style = RectWidthStyle::kTight;
 
-    auto boxes = paragraph->getRectsForPlaceholders();
+    auto boxes = paragraph->getRectsForPlaceholders(TestCanvasWidth);
     canvas.drawRects(SK_ColorRED, boxes);
     REPORTER_ASSERT(reporter, boxes.size() == 1);
     if (boxes.size() >= 1) {
@@ -744,7 +744,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderTopParagraph, reporter) {
     RectHeightStyle rect_height_style = RectHeightStyle::kTight;
     RectWidthStyle rect_width_style = RectWidthStyle::kTight;
 
-    auto boxes = paragraph->getRectsForPlaceholders();
+    auto boxes = paragraph->getRectsForPlaceholders(TestCanvasWidth);
     canvas.drawRects(SK_ColorRED, boxes);
     REPORTER_ASSERT(reporter, boxes.size() == 1);
     if (boxes.size() >= 1) {
@@ -802,7 +802,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderMiddleParagraph, reporter) {
     RectHeightStyle rect_height_style = RectHeightStyle::kTight;
     RectWidthStyle rect_width_style = RectWidthStyle::kTight;
 
-    auto boxes = paragraph->getRectsForPlaceholders();
+    auto boxes = paragraph->getRectsForPlaceholders(TestCanvasWidth);
     canvas.drawRects(SK_ColorRED, boxes);
     REPORTER_ASSERT(reporter, boxes.size() == 1);
     if (boxes.size() >= 1) {
@@ -859,7 +859,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderIdeographicBaselineParagraph, report
     RectHeightStyle rect_height_style = RectHeightStyle::kTight;
     RectWidthStyle rect_width_style = RectWidthStyle::kTight;
 
-    auto boxes = paragraph->getRectsForPlaceholders();
+    auto boxes = paragraph->getRectsForPlaceholders(TestCanvasWidth);
     canvas.drawRects(SK_ColorRED, boxes);
     REPORTER_ASSERT(reporter, boxes.size() == 1);
     if (boxes.size() >= 1) {
@@ -995,7 +995,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderBreakParagraph, reporter) {
         REPORTER_ASSERT(reporter, SkScalarNearlyEqual(boxes[0].rect.bottom(), 249, EPSILON100));
     }
 
-    boxes = paragraph->getRectsForPlaceholders();
+    boxes = paragraph->getRectsForPlaceholders(TestCanvasWidth);
     canvas.drawRects(SK_ColorRED, boxes);
 
     boxes = paragraph->getRectsForRange(4, 45, rect_height_style, rect_width_style);
@@ -1108,7 +1108,7 @@ UNIX_ONLY_TEST(SkParagraph_InlinePlaceholderGetRectsParagraph, reporter) {
     RectHeightStyle rect_height_style = RectHeightStyle::kMax;
     RectWidthStyle rect_width_style = RectWidthStyle::kTight;
 
-    auto boxes = paragraph->getRectsForPlaceholders();
+    auto boxes = paragraph->getRectsForPlaceholders(TestCanvasWidth);
     canvas.drawRects(SK_ColorRED, boxes);
 
     REPORTER_ASSERT(reporter, boxes.size() == 34);
@@ -5673,7 +5673,7 @@ UNIX_ONLY_TEST(SkParagraph_PlaceholderOnly, reporter) {
 
     auto paragraph = builder.Build();
     paragraph->layout(TestCanvasWidth);
-    auto result = paragraph->getRectsForPlaceholders();
+    auto result = paragraph->getRectsForPlaceholders(TestCanvasWidth);
     REPORTER_ASSERT(reporter, result.size() == 1);
 }
 
@@ -8520,7 +8520,7 @@ UNIX_ONLY_TEST(SkParagraph_FloatingPlaceholder, reporter) {
     RectHeightStyle rect_height_style = RectHeightStyle::kMax;
     RectWidthStyle rect_width_style = RectWidthStyle::kTight;
 
-    auto boxes = paragraph->getRectsForPlaceholders();
+    auto boxes = paragraph->getRectsForPlaceholders(TestCanvasWidth);
     canvas.drawRects(SK_ColorRED, boxes);
 
     REPORTER_ASSERT(reporter, boxes.size() == 3);
@@ -8591,7 +8591,7 @@ UNIX_ONLY_TEST(SkParagraph_FloatingPlaceholderQueue, reporter) {
     RectHeightStyle rect_height_style = RectHeightStyle::kMax;
     RectWidthStyle rect_width_style = RectWidthStyle::kTight;
 
-    auto boxes = paragraph->getRectsForPlaceholders();
+    auto boxes = paragraph->getRectsForPlaceholders(TestCanvasWidth);
     canvas.drawRects(SK_ColorRED, boxes);
 
     REPORTER_ASSERT(reporter, boxes.size() == 3);
