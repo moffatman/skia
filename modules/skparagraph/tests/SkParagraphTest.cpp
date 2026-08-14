@@ -8134,6 +8134,42 @@ UNIX_ONLY_TEST(SkParagraph_getLineNumberAt_Ellipsis, reporter) {
     REPORTER_ASSERT(reporter, paragraph->getLineNumberAt(14) == -1);
 }
 
+UNIX_ONLY_TEST(SkParagraph_EllipsisHitTestNearTextEnd, reporter) {
+    sk_sp<ResourceFontCollection> fontCollection = sk_make_sp<ResourceFontCollection>();
+    SKIP_IF_FONTS_NOT_FOUND(reporter, fontCollection)
+    fontCollection->setDefaultFontManager(ToolUtils::TestFontMgr());
+
+    ParagraphStyle paragraphStyle;
+    paragraphStyle.setEllipsis(u"\u2026");
+    paragraphStyle.setMaxLines(1);
+
+    TextStyle textStyle;
+    textStyle.setFontFamilies({SkString("Ahem")});
+    textStyle.setFontSize(10);
+    paragraphStyle.setTextStyle(textStyle);
+
+    constexpr char text[] = "12345678";
+    ParagraphBuilderImpl builder(paragraphStyle, fontCollection, get_unicode());
+    builder.addText(text);
+    auto paragraph = builder.Build();
+    paragraph->layout(70);
+
+    auto impl = static_cast<ParagraphImpl*>(paragraph.get());
+    REPORTER_ASSERT(reporter, impl->lines().size() == 1);
+    const auto* ellipsis = impl->lines().front().ellipsis();
+    REPORTER_ASSERT(reporter, ellipsis != nullptr);
+    // U+2026 occupies three UTF-8 bytes. Near the end of a short paragraph, its synthetic
+    // cluster endpoint lies beyond the original text and must not be used as a paragraph index.
+    REPORTER_ASSERT(reporter,
+                    ellipsis->globalClusterIndex(ellipsis->size()) > strlen(text));
+
+    Paragraph::GlyphInfo glyphInfo;
+    REPORTER_ASSERT(reporter,
+                    paragraph->getClosestUTF16GlyphInfoAt(1000, 5, &glyphInfo));
+    REPORTER_ASSERT(reporter, glyphInfo.fGraphemeClusterTextRange.start == 6);
+    REPORTER_ASSERT(reporter, glyphInfo.fGraphemeClusterTextRange.end == 7);
+}
+
 UNIX_ONLY_TEST(SkParagraph_API_USES_UTF16, reporter) {
     sk_sp<ResourceFontCollection> fontCollection = sk_make_sp<ResourceFontCollection>();
     SKIP_IF_FONTS_NOT_FOUND(reporter, fontCollection)

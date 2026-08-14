@@ -1409,6 +1409,12 @@ PositionWithAffinity TextLine::getGlyphPositionAtCoordinate(SkScalar dx) {
 
                 SkScalar offsetX = this->offset().fX;
                 ClipContext context = context0;
+                auto globalTextIndex = [this, &context](size_t pos) {
+                    auto index = context.run->globalClusterIndex(pos);
+                    // Ellipsis cluster indexes belong to the separately shaped ellipsis text.
+                    // Keep them within the range of original text replaced by the ellipsis.
+                    return context.run->isEllipsis() ? std::min(index, this->text().end) : index;
+                };
 
                 // Correct the clip size because libtxt counts trailing spaces
                 if (run->leftToRight()) {
@@ -1426,7 +1432,7 @@ PositionWithAffinity TextLine::getGlyphPositionAtCoordinate(SkScalar dx) {
 
                 if (dx <= context.clip.fLeft) {
                     // All the other runs are placed right of this one
-                    auto utf16Index = fOwner->getUTF16Index(context.run->globalClusterIndex(context.pos));
+                    auto utf16Index = fOwner->getUTF16Index(globalTextIndex(context.pos));
                     if (run->leftToRight()) {
                         result = { SkToS32(utf16Index), kDownstream};
                         keepLooking = false;
@@ -1441,7 +1447,8 @@ PositionWithAffinity TextLine::getGlyphPositionAtCoordinate(SkScalar dx) {
 
                 if (dx >= context.clip.fRight) {
                     // We have to keep looking ; just in case keep the last one as the closest
-                    auto utf16Index = fOwner->getUTF16Index(context.run->globalClusterIndex(context.pos + context.size));
+                    auto utf16Index = fOwner->getUTF16Index(
+                            globalTextIndex(context.pos + context.size));
                     if (run->leftToRight()) {
                         result = {SkToS32(utf16Index), kUpstream};
                     } else {
@@ -1475,8 +1482,8 @@ PositionWithAffinity TextLine::getGlyphPositionAtCoordinate(SkScalar dx) {
                 SkScalar glyphemesWidth = context.run->positionX(found + 1) - context.run->positionX(found);
 
                 // Find the grapheme range that contains the point
-                auto clusterIndex8 = context.run->globalClusterIndex(found);
-                auto clusterEnd8 = context.run->globalClusterIndex(found + 1);
+                auto clusterIndex8 = globalTextIndex(found);
+                auto clusterEnd8 = globalTextIndex(found + 1);
                 auto graphemes = fOwner->countSurroundingGraphemes({clusterIndex8, clusterEnd8});
 
                 SkScalar center = glyphemePosLeft + glyphemesWidth / 2;
